@@ -21,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -50,26 +51,40 @@ class MainActivity : ComponentActivity() {
 }
 
 
-
 @Preview
 @Composable
 fun MainBoton() {
-    val texto by rememberSaveable{ mutableStateOf("Prueba")}
+    var texto by rememberSaveable { mutableStateOf("") }
+    var nombre by rememberSaveable { mutableStateOf("") }
+    var dialogo by rememberSaveable { mutableStateOf(false) }
+    var saludo by rememberSaveable { mutableStateOf(false) }
+    if (dialogo)
+        DialogExample(
+            nombre = nombre,
+            acepButton = { dialogo = false
+                            saludo = true},
+            onValueChange = { nombre = it })
 
-    Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-        Button(onClick = { /*TODO*/ }) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Button(onClick = { dialogo = true }) {
             Text(text = "Saludar")
         }
+        if (saludo) texto = "Hola, $nombre"
         Text(text = texto, Modifier.padding(top = 20.dp))
     }
 }
 
 
-
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DialogExample(
+    nombre: String,
+    acepButton:() -> Unit,
+    onValueChange: (String) -> Unit
 ) {
     Dialog(onDismissRequest = { /*TODO*/ }) {
         Card(
@@ -78,36 +93,50 @@ fun DialogExample(
                 .height(300.dp),
             colors = CardDefaults.cardColors(containerColor = Color.White)
         ) {
-            Column(modifier = Modifier
-                .fillMaxSize()
-                .padding(top = 15.dp, bottom = 20.dp)) {
-                Row(modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f), horizontalArrangement = Arrangement.End) {
-                    Text(text = "Configuracion", fontSize = 20.sp, modifier = Modifier.padding(end = 20.dp))
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = 15.dp, bottom = 20.dp)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f), horizontalArrangement = Arrangement.End
+                ) {
+                    Text(
+                        text = "Configuracion",
+                        fontSize = 20.sp,
+                        modifier = Modifier.padding(end = 20.dp)
+                    )
                 }
-                Row(modifier = Modifier
-                    .fillMaxWidth()
-                    .padding()
-                    .weight(2f), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
-                    TextField(value = "", onValueChange ={})
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding()
+                        .weight(2f),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    TextField(value = nombre, onValueChange = {onValueChange(it)})
                 }
-                Row(modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 20.dp)
-                    .weight(1f), horizontalArrangement = Arrangement.Center) {
-                    Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center){
-                        Button(onClick = {/*TODO*/}) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 20.dp)
+                        .weight(1f), horizontalArrangement = Arrangement.Center
+                ) {
+                    Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
+                        Button(onClick = {acepButton()}) {
                             Text(text = "Acep")
                         }
                     }
-                    Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center){
-                        Button(onClick = { /*TODO*/}) {
+                    Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
+                        Button(onClick = { /*TODO*/ }) {
                             Text(text = "Canc")
                         }
                     }
-                    Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center){
-                        Button(onClick = { /*TODO*/}) {
+                    Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
+                        Button(onClick = { /*TODO*/ }) {
                             Text(text = "Limp")
                         }
                     }

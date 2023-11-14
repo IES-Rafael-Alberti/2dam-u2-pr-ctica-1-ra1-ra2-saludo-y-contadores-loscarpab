@@ -4,7 +4,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -58,11 +57,34 @@ fun MainBoton() {
     var nombre by rememberSaveable { mutableStateOf("") }
     var dialogo by rememberSaveable { mutableStateOf(false) }
     var saludo by rememberSaveable { mutableStateOf(false) }
+    var contadorCancelar by rememberSaveable { mutableStateOf(0) }
+    var contadorAceptar by rememberSaveable { mutableStateOf(0) }
+    var textoAceptar by rememberSaveable { mutableStateOf("Acep") }
+    var textoCancelar by rememberSaveable { mutableStateOf("Canc") }
+
+    if (contadorAceptar > 0 || contadorCancelar > 0){
+        textoAceptar = "A ($contadorAceptar)"
+        textoCancelar = "C ($contadorCancelar)"
+    }
+
     if (dialogo)
         DialogExample(
             nombre = nombre,
-            acepButton = { dialogo = false
-                            saludo = true},
+            acepButton = {
+                dialogo = false
+                saludo = true
+                contadorAceptar++
+            },
+            cancButton = {
+                dialogo = false
+                saludo = false
+                contadorCancelar++
+            },
+            limpButton = {
+                nombre = ""
+            },
+            textAcep = textoAceptar,
+            textCanc = textoCancelar,
             onValueChange = { nombre = it })
 
     Column(
@@ -73,20 +95,26 @@ fun MainBoton() {
         Button(onClick = { dialogo = true }) {
             Text(text = "Saludar")
         }
-        if (saludo) texto = "Hola, $nombre"
+        texto = if (saludo) "Hola, $nombre"
+        else ""
         Text(text = texto, Modifier.padding(top = 20.dp))
     }
 }
+
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DialogExample(
     nombre: String,
-    acepButton:() -> Unit,
+    acepButton: () -> Unit,
+    cancButton: () -> Unit,
+    limpButton: () -> Unit,
+    textCanc:String,
+    textAcep:String,
     onValueChange: (String) -> Unit
 ) {
-    Dialog(onDismissRequest = { /*TODO*/ }) {
+    Dialog(onDismissRequest = {}) {
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -117,31 +145,26 @@ fun DialogExample(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center
                 ) {
-                    TextField(value = nombre, onValueChange = {onValueChange(it)})
+                    TextField(value = nombre, onValueChange = {onValueChange(it)}, label = {Text(text = "Introduce tu nombre")})
                 }
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 20.dp)
-                        .weight(1f), horizontalArrangement = Arrangement.Center
+                        .weight(1f), horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
-                        Button(onClick = {acepButton()}) {
-                            Text(text = "Acep")
-                        }
+                    Button(onClick = { acepButton() }) {
+                        Text(text = textAcep)
                     }
-                    Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
-                        Button(onClick = { /*TODO*/ }) {
-                            Text(text = "Canc")
-                        }
+                    Button(onClick = { cancButton() }) {
+                        Text(text = textCanc)
                     }
-                    Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
-                        Button(onClick = { /*TODO*/ }) {
-                            Text(text = "Limp")
-                        }
+                    Button(onClick = { limpButton()}) {
+                        Text(text = "Limp")
                     }
                 }
             }
         }
     }
 }
+
